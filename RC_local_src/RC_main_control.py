@@ -72,40 +72,61 @@ class RC_control(Controller):
         self.left = 250
         self.dir = 330
         self.right = 410
-        self.max = 45
-        self.dir_max = 80
+        self.max = 32767
+        self.dir_max = 80  
     def on_L3_up(self, value):
         #value의 범위를 모르겠음
+        if(value<0):
+            value = -value
         self.speed = (value/self.max) * 255
+        self.speed = (int)(self.speed)
         self.myMotor.setSpeed(self.speed)
         self.myMotor.run(Raspi_MotorHAT.FORWARD)
-        print(value)
+        #print("speed"+str(value))
 
     def on_L3_left(self, value):
+        
+        if(value<0):
+            value = -value
         self.dir = (value/self.max) * self.dir_max
-        self.dir +=250
+        self.dir = 330 - self.dir
+        self.dir = (int)(self.dir)
         self.servo.setPWM(0,0,self.dir)
-        print(value)
+        #sleep(0.5)
+        #print("dir"+str(self.dir))
 
     def on_L3_down(self, value):
+        if(value<0):
+            value = -value
         self.speed = (value / self.max) * 255
+        self.speed = (int)(self.speed)
         self.myMotor.setSpeed(self.speed)
+
         self.myMotor.run(Raspi_MotorHAT.BACKWARD)
-        print(value)
+        #print("speed"+str(value))
 
     def on_L3_right(self, value):
+        if(value<0):
+            value = -value
         self.dir = (value / self.max) * self.dir_max
         self.dir += 330
+        self.dir = (int)(self.dir)
         self.servo.setPWM(0, 0, self.dir)
-        print(value)
+        #sleep(0.5)
+        #print("dir"+str(self.dir))
 
     def on_L3_x_at_rest(self):
-        self.myMotor.run(Raspi_MotorHAT.RELEASE)
+        #self.myMotor.run(Raspi_MotorHAT.RELEASE)
         pass
     def on_L3_y_at_rest(self):
+        #self.dir = 330
+        #self.servo.setPWM(0,0,self.dir)
         pass
+    def on_L1_press(self):
+        self.myMotor.run(Raspi_MotorHAT.RELEASE)
 class RC(object):
     def __init__(self):
         controller = RC_control(interface="/dev/input/js0", connecting_using_ds4drv=False)
         controller.listen()
-
+if __name__ == "__main__":
+    RC_obj = RC()
