@@ -1,5 +1,22 @@
 import paho.mqtt.client as mqtt
+from dotenv import load_dotenv
+import os
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
 
+load_dotenv()
+
+firebase_key = os.environ.get('FIREBASE_KEY')
+firebase_pw = os.environ.get('FIREBASE_PW')
+firebase_url = os.environ.get('FIREBASE_URL')
+
+cred = credentials.Certificate('firebase_key')
+firebase_admin.initialize_app(cred, {
+    'databaseURL' : 'firebase_url'
+})
+
+dir = db.reference()
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -14,7 +31,7 @@ def on_disconnect(client, userdata, flags, rc=0):
 
 def on_subscribe(client, userdata, mid, granted_qos):
     print("subscribed: " + str(mid) + " " + str(granted_qos))
-
+    dir.update(mid)
 
 def on_message(client, userdata, msg):
     print(str(msg.payload.decode("utf-8")))

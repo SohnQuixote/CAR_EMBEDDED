@@ -158,7 +158,7 @@ class RC_control(Controller):
         self.dir_max = 80
         self.sense = SenseHat()
         self.sense.clear()  
-        self.s = None
+
     def on_L3_up(self, value):
         #value의 범위를 모르겠음
         if(value<0):
@@ -213,6 +213,26 @@ class RC_control(Controller):
         #self.servo.setPWM(0,0,self.dir)
         pass
     def on_R3_up(self,value):
+        pass
+    def on_R3_down(self,value):
+        pass
+    def on_R3_right(self,value):
+        pass
+    def on_R3_left(self,value):
+        pass
+class SERVER_control(Controller):
+    def __init__(self,**kwargs):
+        Controller.__init__(self, **kwargs)
+        self.s = None
+    def on_L3_up(self,value):
+        pass
+    def on_L3_down(self,value):
+        pass
+    def on_L3_right(self,value):
+        pass
+    def on_L3_left(self,value):
+        pass
+    def on_R3_up(self,value):
         if(self.s != None):
             self.s.send(("F"+(str)(value)).encode())
             repl = self.s.recv(1024)
@@ -237,37 +257,19 @@ class RC_control(Controller):
         self.s = None
     def on_R1_press(self):
         self.s.send(("S").encode())
-'''
-class SERVER_control(Controller):
-    def __init__(self,**kwargs):
-        Controller.__init__(self, **kwargs)
-        self.s = None
-    def on_L3_up(self,value):
-        pass
-    def on_L3_down(self,value):
-        pass
-    def on_L3_right(self,value):
-        pass
-    def on_L3_left(self,value):
-        pass
-'''
 
 def main_control():
     controller = RC_control(interface="/dev/input/js0", connecting_using_ds4drv=False)
     controller.listen()
-'''
 def serve_control():
     server_con = SERVER_control(interface="/dev/input/js0", connecting_using_ds4drv=False)
     server_con.listen()
-'''
 class RC(object):
     def __init__(self):
-        controller = RC_control(interface="/dev/input/js0", connecting_using_ds4drv=False)
-        controller.listen()
-        #t1 = threading.Thread(target = main_control)
-        #t2 = threading.Thread(target = serve_control)
-        #t1.start()
-        #t2.start()
+        t1 = threading.Thread(target = main_control)
+        t2 = threading.Thread(target = serve_control)
+        t1.start()
+        t2.start()
 
 if __name__ == "__main__":
     RC_obj = RC()
